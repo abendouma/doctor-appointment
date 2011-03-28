@@ -32,13 +32,18 @@ public class LoginService {
 		DAOFactory fac = DAOFactory.instance(HibernateDAOFactory.class);
 		DoctorDAO doctorDAO = fac.getDoctorDAO();
 		Doctor doctor = doctorDAO.authorize(username, password);
+		
+		boolean isExisted = doctorDAO.isExisted(username);
 		session.getTransaction().commit();
 
 		if(doctor != null) {
 			return new DoctorInfo(doctor);
 		}
+		else if(isExisted) {
+			return new DoctorInfo(201);//wrong password
+		}
 		else {
-			return new DoctorInfo();
+			return new DoctorInfo(202); //User not found
 		}
 	}
 }
