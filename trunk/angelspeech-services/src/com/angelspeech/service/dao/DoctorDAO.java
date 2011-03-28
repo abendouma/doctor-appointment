@@ -8,4 +8,5 @@ import com.angelspeech.service.core.Doctor;
  */
 public interface DoctorDAO extends GenericDAO<Doctor, Long> {
 	public Doctor authorize(String username, String password);
+	public boolean isExisted(String username);
 }

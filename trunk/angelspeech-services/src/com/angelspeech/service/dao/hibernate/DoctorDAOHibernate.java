@@ -30,4 +30,14 @@ public class DoctorDAOHibernate extends GenericHibernateDAO<Doctor, Long> implem
 		if(returnList.size() == 1) return returnList.get(0);
 		else return null;
 	}
+	
+	@Override
+	public boolean isExisted(String username) {
+		Criteria crit = getSession().createCriteria(Doctor.class);
+		crit.add(Restrictions.eq("username", username));
+		List<Doctor> returnList = crit.list();
+		if(returnList.size() > 0) return true;
+		else return false;
+	}
+
 }
