@@ -1,7 +1,7 @@
-package com.angelspeed.service.util;
+package com.angelspeech.service.util;
 
-import org.hibernate.*;
-import org.hibernate.cfg.*;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.AnnotationConfiguration;
 
 /**
  * @author Quang 
