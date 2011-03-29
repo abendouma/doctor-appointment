@@ -12,8 +12,8 @@ import com.angelspeech.service.core.Doctor;
 import com.angelspeech.service.dao.DAOFactory;
 import com.angelspeech.service.dao.DoctorDAO;
 import com.angelspeech.service.hibernate.HibernateDAOFactory;
+import com.angelspeech.service.util.HibernateUtil;
 import com.angelspeech.service.webservices.dto.DoctorInfo;
-import com.angelspeed.service.util.HibernateUtil;
 
 /**
  * @author Quang 

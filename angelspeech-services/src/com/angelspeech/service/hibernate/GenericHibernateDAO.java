@@ -11,7 +11,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Example;
 
 import com.angelspeech.service.dao.GenericDAO;
-import com.angelspeed.service.util.HibernateUtil;
+import com.angelspeech.service.util.HibernateUtil;
 
 /**
  * @author Quang 

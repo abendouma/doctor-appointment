@@ -1,4 +1,4 @@
-package com.angelspeed.service.test;
+package com.angelspeech.service.test;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import com.angelspeech.service.core.Doctor;
 import com.angelspeech.service.dao.DAOFactory;
 import com.angelspeech.service.dao.DoctorDAO;
 import com.angelspeech.service.hibernate.HibernateDAOFactory;
-import com.angelspeed.service.util.HibernateUtil;
+import com.angelspeech.service.util.HibernateUtil;
 
 /**
  * @author Quang 
