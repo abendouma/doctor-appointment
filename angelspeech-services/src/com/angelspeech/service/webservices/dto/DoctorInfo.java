@@ -13,6 +13,7 @@ public class DoctorInfo {
 	private static final String LOGIN_SUCCESS = "Login successful";
 	private static final String WRONG_PASSWORD = "Wrong password";
 	private static final String USERNAME_NOT_FOUND = "Username not found";
+	private static final String SERVER_ERROR = "Server error";
 	
 	
 	/**
@@ -52,6 +53,10 @@ public class DoctorInfo {
 
 		case 202:
 			this.errorMessage = USERNAME_NOT_FOUND;
+			break;
+
+		case 500:
+			this.errorMessage = SERVER_ERROR;
 			break;
 
 		default:
