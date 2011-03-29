@@ -16,34 +16,42 @@ import com.angelspeech.service.util.HibernateUtil;
 import com.angelspeech.service.webservices.dto.DoctorInfo;
 
 /**
- * @author Quang 
- * mailto:quangnguyen111@gmail.com
+ * @author Quang mailto:quangnguyen111@gmail.com
  */
 @Path("/login")
 public class LoginService {
-	
+
 	@POST
-    @Consumes("application/x-www-form-urlencoded")
-    @Produces("application/xml")
-    public DoctorInfo doctorLogin(@FormParam("username") String username, @FormParam("password") String password) {
-		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-		session.beginTransaction();
+	@Consumes("application/x-www-form-urlencoded")
+	@Produces("application/xml")
+	public DoctorInfo doctorLogin(@FormParam("username") String username, @FormParam("password") String password) {
+		DoctorInfo result;
 
-		DAOFactory fac = DAOFactory.instance(HibernateDAOFactory.class);
-		DoctorDAO doctorDAO = fac.getDoctorDAO();
-		Doctor doctor = doctorDAO.authorize(username, password);
-		
-		boolean isExisted = doctorDAO.isExisted(username);
-		session.getTransaction().commit();
+		try {
 
-		if(doctor != null) {
-			return new DoctorInfo(doctor);
+			Session session = HibernateUtil.getSessionFactory()
+					.getCurrentSession();
+			session.beginTransaction();
+
+			DAOFactory fac = DAOFactory.instance(HibernateDAOFactory.class);
+			DoctorDAO doctorDAO = fac.getDoctorDAO();
+			Doctor doctor = doctorDAO.authorize(username, password);
+
+			boolean isExisted = doctorDAO.isExisted(username);
+			session.getTransaction().commit();
+
+			if (doctor != null) {
+				result = new DoctorInfo(doctor);
+			} else if (isExisted) {
+				result = new DoctorInfo(201);// wrong password
+			} else {
+				result = new DoctorInfo(202); // User not found
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			result = new DoctorInfo(500); // Server error
 		}
-		else if(isExisted) {
-			return new DoctorInfo(201);//wrong password
-		}
-		else {
-			return new DoctorInfo(202); //User not found
-		}
+
+		return result;
 	}
 }
