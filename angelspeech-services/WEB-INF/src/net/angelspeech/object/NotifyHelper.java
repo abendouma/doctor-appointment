@@ -700,7 +700,45 @@ public class NotifyHelper
 		}
 	}
 
-
+	/**
+	 * Notify a patient about the creation of his account.
+	 *
+	 * @param patientRecord	The patient record for the added patient.
+	 * @param doctorRecord	The doctor record for the added patient.
+	 * @param messages	The server messages object to which the success message is added.
+	 */
+	static public void patientAdd (
+		PatientRecord patientRecord,
+		DoctorRecord doctorRecord,
+		MessagesInlineService messages
+	) throws Exception
+	{
+		String emailBody="newPatientRecord.body";
+		String myDoNotContactLink = PatientHelper.getOpenSchedulerApptUrl(patientRecord.patientId, "0", "DoNotContact");
+		String includedLinks =
+				"\n\n DO NOT WANT TO RECEIVE APPOINTMENT REMINDER? CLICK THIS LINK. \n\n" 
+				+ myDoNotContactLink + "\n\n";
+				
+		if (doctorRecord.hasWebAppt.equals("0")){
+			emailBody="newPatientRecord.body.noWebInfo";
+		}
+		if (
+			(patientRecord.email.equals ("") == false) &&
+			(patientRecord.reminderType.equals ("2") || patientRecord.reminderType.equals ("3"))
+		) {
+			String emailResult = EmailHelper.send (
+				SettingsHelper.readString ("newPatientRecord.from", SettingsHelper.EmailSettings),
+				patientRecord.email,
+				TextExpansion.expandDoctor ("newPatientRecord.subject", doctorRecord),
+				TextExpansion.expandDoctorPatient (emailBody, doctorRecord, patientRecord)
+				+ includedLinks,
+				false
+			);
+			messages.addGenericMessage (emailResult);
+		} else {
+			messages.addGenericMessage ("error.email.noaddr");
+		}
+	}
 
 	/**
 	 * Notify a patient about the creation of his account.
@@ -801,6 +839,41 @@ public class NotifyHelper
 			messages.addGenericMessage ("error.email.noaddr");
 		}
 	}
+	
+	/**
+	 * Notify a patient about the modification of his account.
+	 *
+	 * @param patientRecord	The patient record for the deleted patient.
+	 * @param doctorRecord	The doctor record for the deleted patient.
+	 * @param messages	The server messages object to which the success message is added.
+	 */
+	static public void patientEdit (
+		PatientRecord patientRecord,
+		DoctorRecord doctorRecord,
+		MessagesInlineService messages
+	) throws Exception
+	{
+		String emailBody="updatePatientRecord.body";
+		if (doctorRecord.hasWebAppt.equals("0")){
+			emailBody="updatePatientRecord.body.noWebInfo";
+		}
+
+		if (
+			(patientRecord.email.equals ("") == false) &&
+			(patientRecord.reminderType.equals ("2") || patientRecord.reminderType.equals ("3"))
+		) {
+			String emailResult = EmailHelper.send (
+				SettingsHelper.readString ("updatePatientRecord.from", SettingsHelper.EmailSettings),
+				patientRecord.email,
+				TextExpansion.expandDoctor ("updatePatientRecord.subject", doctorRecord),
+				TextExpansion.expandDoctorPatient (emailBody, doctorRecord, patientRecord),
+				false
+			);
+			messages.addGenericMessage (emailResult);
+		} else {
+			messages.addGenericMessage ("error.email.noaddr");
+		}
+	}
 
 	/**
 	 * Notify a patient about the addition of an appointment.
@@ -870,6 +943,75 @@ public class NotifyHelper
 		}
 	}
 
+	/**
+	 * Notify a patient about the addition of an appointment.
+	 *
+	 * @param appointmentInfo	The appointment record for the added appointment.
+	 * @param messages		The server messages object to which the success message is added.
+	 */
+	static public void appointmentAdd (
+		AppointmentInfo appointmentInfo,
+		MessagesInlineService messages
+	) throws Exception
+	{
+		PatientRecord patientRecord = new PatientRecord ();
+		DoctorRecord doctorRecord = new DoctorRecord ();
+		String patientPrefers;
+
+		patientRecord.readById (appointmentInfo.patientId);
+		doctorRecord.readById (patientRecord.doctorId);
+		patientPrefers = patientRecord.reminderType;
+
+		String emailBodyProperty="apptAdded.body";
+		if (doctorRecord.hasWebAppt.equals("0")){
+			emailBodyProperty="apptAdded.body.noWebInfo";
+		}
+
+		if (
+			(patientRecord.email.equals ("") == false) &&
+			(patientPrefers.equals ("2") || patientPrefers.equals ("3"))
+		) {
+			String subject, bodyText;
+			EmailTemplateRecord etr = new EmailTemplateRecord();
+			if("1".equals(doctorRecord.customizeEmail) && etr.readByFilter(new String[][]{{"doctorId", doctorRecord.doctorId},{"templateName", Template.ApptConfirmationEmail.toString()}})) {
+				subject = TemplateExpander.expand(etr.subject, patientRecord, doctorRecord, appointmentInfo);
+				bodyText = TemplateExpander.expand(etr.templateContent, patientRecord, doctorRecord, appointmentInfo);
+			} else {
+				subject = TextExpansion.expandDoctor ("apptAdded.subject", doctorRecord);
+				bodyText = TextExpansion.expandAppointment (emailBodyProperty, doctorRecord, patientRecord, appointmentInfo);
+			}
+			//Get included link for open scheduler user
+			String openSchedulerLinks;
+			if (doctorRecord.newPatient.equals("4")){
+				String myRecordConfirmationLink = PatientHelper.getOpenSchedulerApptUrl(appointmentInfo.patientId, appointmentInfo.apptId, "ConfirmAppt");
+				String myApptCancellationLink = PatientHelper.getOpenSchedulerApptUrl(appointmentInfo.patientId, appointmentInfo.apptId, "CancelAppt");
+				MyNetworkData myNetworkData = MyNetworkData.getInstance();
+				String myExistingApptLink = (myNetworkData.myNewPatientSignupURL+"?officePhone="+doctorRecord.bizPhone).replace("index2", "index");
+
+				openSchedulerLinks = 
+				"\n\n TO CANCEL YOUR APPOINTMENT, CLICK THIS LINK.  \n\n"
+				+ myApptCancellationLink + "\n\n"
+				+ "\n\n TO ADD A NEW APPOINTMENT, CLICK THIS LINK. \n\n"
+				+ myExistingApptLink + "\n\n"
+				+ "\n\n TO RESCHEDULE, SIMPLY CANCEL YOUR APPOINTMENT AND ADD A NEW ONE. \n\n";
+			}else{
+				openSchedulerLinks=""; //nothing if no such service
+			}
+			String emailResult = EmailHelper.send (
+				SettingsHelper.readString ("apptAdded.from", SettingsHelper.EmailSettings),
+				patientRecord.email,
+				subject,
+				bodyText
+				+ openSchedulerLinks
+				+ patientSMSSignupAd(doctorRecord, patientRecord)
+				+ newPatientSignupAd(doctorRecord),
+				false
+			);
+			messages.addGenericMessage (emailResult);
+		}
+	}
+
+	
 	/**
 	 * Notify a patient about the addition of an appointment.
 	 * This method is called without inline message object
