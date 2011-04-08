@@ -7,7 +7,7 @@ import net.angelspeech.object.TimeHelper;
 
 public class AngelspeedUtils {
 	
-	public static int getEpochDay(String date)
+	public static int getStartDay(String date)
 	{
 		String [] dateParts;
 		try {
@@ -28,6 +28,7 @@ public class AngelspeedUtils {
 	 */
 	public static int getStartSlot (String startHourString, String startMinuteString, int epochDay, String doctorId)
 	{
+		System.out.println( startHourString +", "+ startMinuteString +", "+  epochDay +", "+  doctorId);
 		
 		int startSlot=0;
 		
@@ -46,7 +47,13 @@ public class AngelspeedUtils {
 			}
 			return startSlot;
 		} catch (Exception ex) {
+			System.out.println(ex);
+			ex.printStackTrace();
 			return (-1);
 		}
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(getStartSlot("10", "45", 15073, "1"));
 	}
 }

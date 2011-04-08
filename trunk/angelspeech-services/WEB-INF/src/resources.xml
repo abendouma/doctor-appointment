@@ -1,0 +1,66 @@
+<naming>
+	<context>
+		<resource name="jdbc/mysql-angelspeech" type="javax.sql.DataSource">
+			<parameter>
+				<name>maxActive</name>
+				<value>100</value>
+			</parameter>
+			<parameter>
+				<name>maxIdle</name>
+				<value>30</value>
+			</parameter>
+			<parameter>
+				<name>maxWait</name>
+				<value>10000</value>
+			</parameter>
+			<parameter>
+				<name>username</name>
+				<value>manager</value>
+			</parameter>
+			<parameter>
+				<name>password</name>
+				<value>12345</value>
+			</parameter>
+			<parameter>
+				<name>driverClassName</name>
+				<value>com.mysql.jdbc.Driver</value>
+			</parameter>
+			<parameter>
+				<name>url</name>
+				<value>jdbc:mysql://www.angelspeech.net:3306/angelspeech</value>
+			</parameter>
+		</resource>
+
+		<resource name="jdbc/angelspeech-readOnly" type="javax.sql.DataSource">
+			<parameter>
+				<name>maxActive</name>
+				<value>100</value>
+			</parameter>
+			<parameter>
+				<name>maxIdle</name>
+				<value>30</value>
+			</parameter>
+			<parameter>
+				<name>maxWait</name>
+				<value>10000</value>
+			</parameter>
+			<parameter>
+				<name>username</name>
+				<value>manager</value>
+			</parameter>
+			<parameter>
+				<name>password</name>
+				<value>12345</value>
+			</parameter>
+			<parameter>
+				<name>driverClassName</name>
+				<value>com.mysql.jdbc.Driver</value>
+			</parameter>
+			<parameter>
+				<name>url</name>
+				<value>jdbc:mysql://www.angelspeech.net:3306/angelspeech</value>
+			</parameter>
+		</resource>
+
+	</context>
+</naming>
