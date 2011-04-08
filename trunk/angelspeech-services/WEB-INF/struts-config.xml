@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE struts-config PUBLIC
+          "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN"
+          "http://jakarta.apache.org/struts/dtds/struts-config_1_2.dtd">
+<struts-config>
+	<global-forwards>
+		<forward name="success" path="/WEB-INF/results/confirm.jsp" />
+	</global-forwards>
+	<action-mappings>
+<!-- 		<action path="/register1" type="coreservlets.RegisterAction1"> -->
+<!-- 		</action> -->
+<!-- 		<action path="/register2" type="coreservlets.RegisterAction2"> -->
+<!-- 			<forward name="bad-address" path="/WEB-INF/results/bad-address.jsp" /> -->
+<!-- 			<forward name="bad-password" path="/WEB-INF/results/bad-password.jsp" /> -->
+<!-- 		</action> -->
+		<action path="/test" type="net.angelspeech.action.doctor.TestAction">
+		</action>
+	</action-mappings>
+</struts-config>
+
