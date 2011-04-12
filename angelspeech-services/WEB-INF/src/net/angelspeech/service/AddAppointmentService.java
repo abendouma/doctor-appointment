@@ -1,6 +1,5 @@
 package net.angelspeech.service;
 
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -12,31 +11,31 @@ import net.angelspeech.database.DoctorRecord;
 import net.angelspeech.database.PatientRecord;
 import net.angelspeech.object.AppointmentInfo;
 import net.angelspeech.object.ApptSearchHelper;
-import net.angelspeech.object.HttpHelper;
-import net.angelspeech.object.MessagesInline;
 import net.angelspeech.object.MessagesInlineService;
 import net.angelspeech.object.NotifyHelper;
+import net.angelspeech.object.NotifyHelperService;
 import net.angelspeech.object.PatientHelper;
 import net.angelspeech.object.PhoneHelper;
-import net.angelspeech.object.SessionDoctor;
+import net.angelspeech.object.RESTfulServiceHelper;
 import net.angelspeech.object.TimeHelper;
-import net.angelspeech.service.dto.ResultNoticeInfo;
+import net.angelspeech.service.dto.AppointmentServiceInfo;
 import net.angelspeech.util.AngelspeedUtils;
+import net.angelspeech.util.MessageResourcesManager;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.validator.DynaValidatorForm;
 
 /**
  * @author Quang mailto:quangnguyen111@gmail.com
  */
 @Path("/addappt")
-public class AddAppointmentService {
+public class AddAppointmentService extends WebServiceSupport {
 	static private Logger logger = Logger.getLogger(AddAppointmentService.class);
-	
+	private static final String DURATION = "15";
+
 	@POST
 	@Consumes("application/x-www-form-urlencoded")
 	@Produces("application/xml")
-	public ResultNoticeInfo addAppointment(@FormParam("doctorId") String doctorId, 
+	public AppointmentServiceInfo addAppointment(@FormParam("doctorId") String doctorId, 
 										@FormParam("firstname") String firstname,
 										@FormParam("lastname") String lastname,
 										@FormParam("phone") String phone,
@@ -45,13 +44,16 @@ public class AddAppointmentService {
 										@FormParam("date") String date,
 										@FormParam("hour") String hour,
 										@FormParam("minute") String minute,
-										@FormParam("apptProfileId") String apptProfileId) throws Exception {
-//		String resultMessage = "";
+										@FormParam("apptProfileId") String apptProfileId,
+										@FormParam("restkey") String restkey) throws Exception {
 		
+		this.messageResources = new MessageResourcesManager(context.getRealPath("/"));
+		System.out.println(this.messageResources);
+		System.out.println(this.messageResources.getValue("error.login"));
+		System.out.println(this.messageResources.getValue("error.appt.not.existed"));
 		String useCustomizeAppt = "";
-		String duration = "15";
+		String duration = DURATION;
 		
-//		DynaValidatorForm aForm;
 		MessagesInlineService messages = new MessagesInlineService ();
 		String patientId;
 		PatientRecord patientRecord = new PatientRecord ();
@@ -59,77 +61,57 @@ public class AddAppointmentService {
 		DoctorRecord doctorRecord = new DoctorRecord ();
 		AppointmentInfo appointmentInfo = new AppointmentInfo ();
 
-//		HttpHelper.disableCache (response);
 		if (doctorId == null) {
 			logger.info("Logout on addApptSubmit caused by missing doctorId");
-			return new ResultNoticeInfo("login.error");
+			return new AppointmentServiceInfo(201, this.messageResources.getValue("error.login"));
 		}
-//		if (SessionDoctor.checkAccess (request, doctorId) == false) {
-//			logger.info("Logout on addApptSubmit caused by checkAccess failure");
-//			logger.info("doctorId is "+ doctorId);
-//			return (mapping.findForward ("doctorLogin"));
-//		}
+		
+		if (restkey == null) {
+			logger.info("REST key is null");
+			return new AppointmentServiceInfo(201, this.messageResources.getValue("error.login"));
+		}
+		
+		if (!RESTfulServiceHelper.isRESTKeyValid(doctorId, restkey)) {
+			logger.info("Invalid Rest key");
+			return new AppointmentServiceInfo(201, this.messageResources.getValue("error.login"));
+		}
+		
 		/*
 		BUG FIX: store the epochDay and startSlot value into session so
 		that add-appt.jsp can reload original form user input after
 		struts page forward following data validation failure
 		*/
-//		aForm = (DynaValidatorForm) form;
-//		String apptProfileId = aForm.getString("apptProfileId");
-		if (apptProfileId.length()==0){
+		if (apptProfileId.length()==0) {
 			apptProfileId = "0";
 		}
 		int epochDay = AngelspeedUtils.getStartDay (date);
 		
 		// if input date format is bad
-		
 		if (epochDay == -1){
 			messages.addGenericMessage ("error.invalid.startDate");
-//			messages.save ();
-//			request.setAttribute ("doctorId", doctorId);
-//			request.setAttribute ("apptProfileId", apptProfileId);
-			return new ResultNoticeInfo("error.invalid.startDate");
-		
+			return new AppointmentServiceInfo(201, this.messageResources.getValue("error.invalid.startDate"), doctorId, apptProfileId);
 		}
+		
 		int startSlot = AngelspeedUtils.getStartSlot (hour, minute, epochDay, doctorId);
 		if (startSlot == -1){
 			messages.addGenericMessage ("error.invalid.startMinute");
-//			messages.save ();
-//			request.setAttribute ("doctorId", doctorId);
-//			request.setAttribute ("apptProfileId", apptProfileId);
-			return new ResultNoticeInfo("error.invalid.startMinute");
+			return new AppointmentServiceInfo(201, this.messageResources.getValue("error.invalid.startMinute"), doctorId, apptProfileId);
 		}
 		
-//		HttpSession session = request.getSession();
-//		session.setAttribute("epochDay", new Integer (epochDay));
-//		session.setAttribute("startSlot", new Integer (startSlot));
-//		session.setAttribute ("apptProfileId",  new Integer(apptProfileId));
-		//logger.info("Store epochDay("+epochDay+") and startSlot("+startSlot+") into session.");
-//		messages.addActionMessages (aForm.validate (mapping, request));
 		if (messages.isEmptyDisplay () == false) {
-//			messages.save ();
-//			request.setAttribute ("doctorId", doctorId);
-//			request.setAttribute ("apptProfileId", apptProfileId);
-			return new ResultNoticeInfo("error.message.failure");
+			return new AppointmentServiceInfo(201, this.messageResources.getValue("error.message.failure"), doctorId, apptProfileId);
 		}
 		if (epochDay < TimeHelper.currentEpochDay ()) {
 			messages.addGenericMessage ("error.failed.apptAdd");
-//			messages.save ();
-//			request.setAttribute ("doctorId", doctorId);
-//			request.setAttribute ("epochDay", new Integer (epochDay));
-//			request.setAttribute ("startSlot", new Integer (startSlot));
-//			request.setAttribute ("apptProfileId", apptProfileId);
-			return new ResultNoticeInfo("error.failed.apptAdd");
+			return new AppointmentServiceInfo(201, this.messageResources.getValue("error.failed.apptAdd"), doctorId, epochDay + "", startSlot + "", apptProfileId);
 		}
 		doctorRecord.readById (doctorId);
 		phone = PhoneHelper.normalize(phone, false);
+		
 		// create patient record only if phone number is valid
 		if (phone== null) {
 			messages.addGenericMessage ("error.invalid.phone");
-//			messages.save ();
-//			request.setAttribute ("doctorId", doctorId);
-//			request.setAttribute ("apptProfileId", apptProfileId);
-			return new ResultNoticeInfo("error.invalid.phone");
+			return new AppointmentServiceInfo(201, this.messageResources.getValue("error.invalid.phone"), doctorId, apptProfileId);
 		}
 		// if patient is new, add new record and the optional data
 		if (patientRecord.readByFilter (new String [][] {
@@ -162,7 +144,7 @@ public class AddAppointmentService {
 			PatientHelper.patientMatrixUpdate (messages, patientId);
 			messages.addGenericMessage ("success.patientAdd");
 			patientRecord.patientId = patientId;
-//			NotifyHelper.patientAdd (patientRecord, doctorRecord, messages); //temporary disable
+//			NotifyHelperService.patientAdd (patientRecord, doctorRecord, messages);//temporary disable
 		}
 		/**
 		*	if patient record is found successfully (not new patient)...
@@ -170,8 +152,7 @@ public class AddAppointmentService {
 		*/
 		if (patientRecord.isRestricted.equalsIgnoreCase("1")){
 			messages.addGenericMessage ("error.failed.isRestricted");
-//			messages.save ();
-			return new ResultNoticeInfo("error.failed.isRestricted");
+			return new AppointmentServiceInfo(201, this.messageResources.getValue("error.failed.isRestricted"), doctorId, apptProfileId);
 		}
 		//pending patient can only make one appt
 		if(patientRecord.isRestricted.equals("2")){
@@ -179,9 +160,7 @@ public class AddAppointmentService {
 			logger.info("the pending patient id " + patientRecord.patientId + " has "+ apptTotal+ " appt now");
 			if (apptTotal != 0) {
 				messages.addGenericMessage ("error.failed.isRestricted");
-//				messages.save ();
-//				return (mapping.findForward ("success"));
-				return new ResultNoticeInfo("error.failed.isRestricted");
+				return new AppointmentServiceInfo(201, this.messageResources.getValue("error.failed.isRestricted"), doctorId, apptProfileId);
 			}
 		}
 		//Save or update the email on patient record if it was new or modified
@@ -191,7 +170,7 @@ public class AddAppointmentService {
 			PatientHelper.multiUpdate (patientRecord);
 			messages.setPatientOne (doctorId, patientRecord.patientId);
 			messages.addGenericMessage ("success.patientEdit");
-			NotifyHelper.patientEdit (patientRecord, doctorRecord, messages);
+			NotifyHelperService.patientEdit (patientRecord, doctorRecord, messages);
 		}
 		// update patient activity status on record
 		patientRecord.isActive = "1";
@@ -232,7 +211,7 @@ public class AddAppointmentService {
 //			request.setAttribute ("epochDay", new Integer (epochDay));
 //			request.setAttribute ("startSlot", new Integer (startSlot));
 //			request.setAttribute ("apptProfileId", apptProfileId);
-			return new ResultNoticeInfo("error.failed.setProfileAndRankEnd");
+			return new AppointmentServiceInfo(201, this.messageResources.getValue("error.failed.setProfileAndRankEnd"), doctorId, epochDay + "", startSlot + "", apptProfileId);
 		}
 		if (appointmentInfo.create (false) == false) {
 			messages.addGenericMessage ("error.failed.apptAdd");
@@ -242,18 +221,17 @@ public class AddAppointmentService {
 //			request.setAttribute ("startSlot", new Integer (startSlot));
 //			request.setAttribute ("apptProfileId", apptProfileId);
 //			return (mapping.findForward ("failure"));
-			return new ResultNoticeInfo("error.failed.apptAdd");
+			return new AppointmentServiceInfo(201, this.messageResources.getValue("error.failed.apptAdd"), doctorId, epochDay + "", startSlot + "", apptProfileId);
 		}
 		messages.setSchedule (doctorId, appointmentInfo.epochDay, null);
 		messages.addGenericMessage ("success.apptAdd");
-		NotifyHelper.appointmentAdd (appointmentInfo, messages);
+		NotifyHelperService.appointmentAdd (appointmentInfo, messages);
 		/** 
 		if customized appt is active (set to 1)
 		Send email with question form link if apptProfile requires
 		question form be filled by patient
 		*/
 		if (doctorRecord.hasCustomizeAppt.equals("1")){
-//			apptProfileId = aForm.getString ("apptProfileId");
 			ApptProfileRecord apptProfileRecord = new ApptProfileRecord ();		
 			apptProfileRecord.readById(apptProfileId);
 			if (apptProfileRecord.hasQuestionForm.equals("1")){
@@ -261,9 +239,8 @@ public class AddAppointmentService {
 				NotifyHelper.requestPatientQuestionForm(appointmentInfo, apptProfileRecord);
 			}
 		}
-//		messages.save ();
 
-		return new ResultNoticeInfo("success");
+		return new AppointmentServiceInfo(200, this.messageResources.getValue("success.apptAdd"), doctorId, epochDay + "", startSlot + "", apptProfileId, appointmentInfo.patientId, appointmentInfo.apptId,appointmentInfo.notes);
 	}
 	
 	private boolean setProfileAndRangeEnd(AppointmentInfo appointmentInfo,
