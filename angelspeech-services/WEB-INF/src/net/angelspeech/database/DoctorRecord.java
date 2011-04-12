@@ -94,6 +94,7 @@ public class DoctorRecord extends GenericRecord
 	public String hasGoogleSync;
 	public String googleUsername;
 	public String googlePassword;
+	public String staffPassword;
 	public String newPatient;
 	public String noticeToNewPatient;
 	public String insuranceList;
@@ -104,6 +105,7 @@ public class DoctorRecord extends GenericRecord
 	public String prepaidCallBalance;
 	public String prepaidAlertlimit;
 	public String prepaidLowBalanceAlert;	
+	public String RESTkey;
 
 	public DoctorRecord () throws Exception
 	{
