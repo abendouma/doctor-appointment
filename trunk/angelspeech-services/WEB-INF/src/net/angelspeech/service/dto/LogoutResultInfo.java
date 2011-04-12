@@ -7,13 +7,16 @@ import javax.xml.bind.annotation.XmlRootElement;
  * mailto:quangnguyen111@gmail.com
  */
 @XmlRootElement
-public class ResultNoticeInfo {
+public class LogoutResultInfo {
+	public int code;
 	public String notice;
 	
-	public ResultNoticeInfo(String notice) {
+	public LogoutResultInfo(int code, String notice) {
+		this.code = code;
 		this.notice = notice;
 	}
-	
-	public ResultNoticeInfo() {
+
+	public LogoutResultInfo() {
 	}
+
 }

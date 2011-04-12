@@ -10,11 +10,6 @@ import net.angelspeech.database.DoctorRecord;
  */
 @XmlRootElement
 public class DoctorInfo {
-	private static final String LOGIN_SUCCESS = "Login successful";
-	private static final String WRONG_PASSWORD = "Wrong password";
-	private static final String USERNAME_NOT_FOUND = "Username not found";
-	private static final String SERVER_ERROR = "Server error";
-	
 	
 	/**
 	 * Error code
@@ -33,35 +28,22 @@ public class DoctorInfo {
 	public String firstName;
 	public String lastName;
 	public String email;
+	public String RESTKey;
 
-	public DoctorInfo(DoctorRecord doctor) {
+	public DoctorInfo(DoctorRecord doctor, String errorMessage) {
 		this.doctorId = doctor.doctorId;
 		this.username = doctor.username;
 		this.firstName = doctor.firstName;
 		this.lastName = doctor.lastName;
 		this.email = doctor.email;
 		this.errorCode = 200;
-		this.errorMessage = LOGIN_SUCCESS;
+		this.errorMessage = errorMessage;
+		this.RESTKey = doctor.RESTkey;
 	}
 	
-	public DoctorInfo(int errorCode) {
+	public DoctorInfo(int errorCode, String errorMessage) {
 		this.errorCode = errorCode;
-		switch (errorCode) {
-		case 201:
-			this.errorMessage = WRONG_PASSWORD;
-			break;
-
-		case 202:
-			this.errorMessage = USERNAME_NOT_FOUND;
-			break;
-
-		case 500:
-			this.errorMessage = SERVER_ERROR;
-			break;
-
-		default:
-			break;
-		}
+		this.errorMessage = errorMessage;
 	}
 
 	public DoctorInfo() {
