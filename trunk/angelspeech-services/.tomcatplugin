@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tomcatProjectProperties>
+    <rootDir>/</rootDir>
+    <exportSource>false</exportSource>
+    <reloadable>true</reloadable>
+    <redirectLogger>false</redirectLogger>
+    <updateXml>true</updateXml>
+    <warLocation>C:\Users\Quang\Desktop\web-service.war</warLocation>
+    <extraInfo></extraInfo>
+    <webPath>/angelspeech-services</webPath>
+</tomcatProjectProperties>

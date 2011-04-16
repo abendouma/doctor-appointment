@@ -2,8 +2,6 @@ package net.angelspeech.service.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import net.angelspeech.object.AppointmentInfo;
-
 /**
  * @author Quang 
  * mailto:quangnguyen111@gmail.com
