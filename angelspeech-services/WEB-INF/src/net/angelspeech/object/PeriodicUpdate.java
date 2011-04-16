@@ -5,6 +5,8 @@ import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 
+import net.angelspeech.service.dto.sync.SyncInfo;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -82,6 +84,20 @@ public class PeriodicUpdate
 		}
 		jsObject = BuildJavaScript.build (messages.fetch ().toArray (new Object [0]));
 		return jsObject;
+	}
+	
+	static public SyncInfo iphoneSynch (String doctorId) throws Exception {
+
+		IphoneSyncDataStore iphoneSyncDataStore = new IphoneSyncDataStore();
+		
+		iphoneSyncDataStore.setDoctor (doctorId);
+		iphoneSyncDataStore.setLocationAll (doctorId);
+		iphoneSyncDataStore.setAppointmentProfileAll (doctorId);
+		iphoneSyncDataStore.setSchedule (doctorId, -1, null);
+		iphoneSyncDataStore.setPatientAll (doctorId);//xong cho nay
+	
+		SyncInfo syncInfo = iphoneSyncDataStore.getSyncInfo();
+		return syncInfo;
 	}
 
 	static public boolean sendLoop (HttpServletRequest request, OutputStream outputStream) throws Exception
