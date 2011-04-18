@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
-import org.apache.struts.validator.DynaValidatorForm;
-import net.angelspeech.database.MyNetworkData;
+
 import net.angelspeech.database.DoctorRecord;
+import net.angelspeech.database.MyNetworkData;
 import net.angelspeech.database.Patient2Record;
 import net.angelspeech.database.PatientRecord;
 import net.angelspeech.database.ScheduleApptRecord;
@@ -307,44 +307,44 @@ public class PatientHelper
 			return (rows [0][0]);
 		}
 	}
-	/*
-	* This method fileter/match one patientId from an allowed list
-	* using a few matching parametres, This method could be used
-	* for security check (double check) of a existing patientId against
-	* other paremeters.
-	*/
-	static public String getPatientId (
-		String doctorId,
-		String [] allowedPatients,
-		DynaValidatorForm form
-	) throws Exception
-	{
-		String allowedList;
-		int i;
-		String [][] rows;
-
-		allowedList = "";
-		for (i = 0; i < allowedPatients.length; ++i) {
-			allowedList +=
-				((i == 0) ? "" : ", ") +
-				("'" + SqlQuery.escape (allowedPatients [i]) + "'");
-		}
-		rows = SqlQuery.query (
-			"SELECT patientId " +
-			"FROM patients " +
-			"WHERE " +
-				"patientId IN (" + allowedList + ") AND " +
-				"doctorId='" + SqlQuery.escape (doctorId) + "' AND " +
-				"firstName='" + SqlQuery.escape (form.getString ("firstName")) + "' AND " +
-				"lastName='" + SqlQuery.escape (form.getString ("lastName")) + "' AND " +
-				"email='" + SqlQuery.escape (form.getString ("email")) + "'"
-				//"phone='" + SqlQuery.escape (form.getString ("phone")) + "'"
-		);
-		if (rows.length == 0) {
-			return (null);
-		}
-		return (rows [0][0]);
-	}
+//	/*
+//	* This method fileter/match one patientId from an allowed list
+//	* using a few matching parametres, This method could be used
+//	* for security check (double check) of a existing patientId against
+//	* other paremeters.
+//	*/
+//	static public String getPatientId (
+//		String doctorId,
+//		String [] allowedPatients,
+//		DynaValidatorForm form
+//	) throws Exception
+//	{
+//		String allowedList;
+//		int i;
+//		String [][] rows;
+//
+//		allowedList = "";
+//		for (i = 0; i < allowedPatients.length; ++i) {
+//			allowedList +=
+//				((i == 0) ? "" : ", ") +
+//				("'" + SqlQuery.escape (allowedPatients [i]) + "'");
+//		}
+//		rows = SqlQuery.query (
+//			"SELECT patientId " +
+//			"FROM patients " +
+//			"WHERE " +
+//				"patientId IN (" + allowedList + ") AND " +
+//				"doctorId='" + SqlQuery.escape (doctorId) + "' AND " +
+//				"firstName='" + SqlQuery.escape (form.getString ("firstName")) + "' AND " +
+//				"lastName='" + SqlQuery.escape (form.getString ("lastName")) + "' AND " +
+//				"email='" + SqlQuery.escape (form.getString ("email")) + "'"
+//				//"phone='" + SqlQuery.escape (form.getString ("phone")) + "'"
+//		);
+//		if (rows.length == 0) {
+//			return (null);
+//		}
+//		return (rows [0][0]);
+//	}
 	/*
 	* This method count total appts for a patient
 	*
