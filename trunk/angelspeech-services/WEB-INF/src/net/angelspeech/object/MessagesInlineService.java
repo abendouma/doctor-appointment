@@ -2,10 +2,6 @@ package net.angelspeech.object;
 
 //import net.angelspeech.object.CacheItems;
 
-import java.util.LinkedList;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import org.apache.struts.action.ActionMessages;
 
 /**
  * This class contains code methods for handling of server messages that are sent to the client
@@ -29,17 +25,7 @@ public class MessagesInlineService
 		messagesStore = new MessagesStore ();
 		messagesDisplay = new MessagesDisplay ();
 	}
-
-	/**
-	 * Add the specified action messages to the list of displayed alert messages
-	 *
-	 * @param actionMessages	The action messages which are added to the
-	 *				list of displayed alert messages.
-	 */
-	public void addActionMessages (ActionMessages actionMessages)
-	{
-		messagesDisplay.addActionMessages (actionMessages);
-	}
+	
 
 	/**
 	 * Add the specified generic message to the list of displayed alert messages

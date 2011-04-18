@@ -3,17 +3,11 @@ package net.angelspeech.object;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.angelspeech.object.MessagesInline;
-import net.angelspeech.object.SessionDoctor;
-import net.angelspeech.object.SuperuserHelper;
-import net.angelspeech.object.ApptSearchHelper;
-
-import net.angelspeech.database.PatientRecord;
 import net.angelspeech.database.DoctorRecord;
+import net.angelspeech.database.PatientRecord;
 import net.angelspeech.database.SuperuserRecord;
 
 import org.apache.log4j.Logger;
-import org.apache.struts.validator.DynaValidatorForm;
 
 /**
  * This class contains helper functions which login doctors/superusers.
